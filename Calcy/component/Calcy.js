@@ -20,11 +20,24 @@ class Calcy extends Component {
     };
 
     handleCalculations = () => {
-        this.setState({
+      this.validate() &&  this.setState({
             resultString : eval(this.state.calculationString),
         });
     };
 
+    validate = () => {
+        let text = this.state.calculationString
+        switch(text.slice(-1)){
+            case '+':
+            case '-':
+            case '/':
+            case '*':
+            case '%':
+            case '^':
+                return false
+        }
+        return  true
+    }
 
     handlerResult = (text) => {
         if(text == '='){
