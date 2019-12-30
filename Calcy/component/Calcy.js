@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native'
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 
 class Calcy extends Component {
     constructor() {
@@ -8,6 +8,8 @@ class Calcy extends Component {
             calculationString : '',
             resultString : 0
         };
+        this.nums = [['AC','^','%'],[7,8,9],[4,5,6],[1,2,3],['.',0,'=']];
+        this.operator = ['del','/','*','-','+'];
     }
 
     handlerReset = () => {
@@ -20,8 +22,9 @@ class Calcy extends Component {
     handleCalculations = () => {
         this.setState({
             resultString : eval(this.state.calculationString),
-        })
-    }
+        });
+    };
+
 
     handlerResult = (text) => {
         if(text == '='){
@@ -30,6 +33,13 @@ class Calcy extends Component {
         else if(text=='AC'){
              return this.handlerReset();
         }
+        else if(text=='^' || text=='%'){
+                let Char = this.state.calculationString.split('').pop();
+                if(this.state.calculationString == '') return
+                this.setState({
+                    calculationString : this.state.calculationString + text,
+                });
+        }
         else{
             this.setState({
                 calculationString : this.state.calculationString + text,
@@ -37,23 +47,47 @@ class Calcy extends Component {
         }
     };
 
+    operations = (operation) => {
+        switch(operation){
+            case 'del' :
+                let text = this.state.calculationString.split('');
+                text.pop();
+                text = text.join('');
+                this.setState({
+                    calculationString : text,
+                });
+                break
+            case '+':
+            case '-':
+            case '/':
+            case '*':
+            case '%':
+            case '^':
+                const lastChar = this.state.calculationString.split('').pop();
+                if(this.operator.indexOf(lastChar) > 0) return
+
+                if(this.state.calculationString == '') return
+                this.setState({
+                    calculationString : this.state.calculationString + operation,
+                });
+
+        }
+    }
+
     render() {
 
         let rows = [];
-        let nums = [['AC','^','%'],[7,8,9],[4,5,6],[1,2,3],['.',0,'=']];
-        let operator = ['del','/','*','-','+'];
-
         for(let i=0; i<5; i++){
             let row = [];
             for(let j=0; j<3; j++){
-                if(nums[i][j]=='=' || nums[i][j]=='%' || nums[i][j]=='^' || nums[i][j]=='AC'){
-                    row.push(<TouchableOpacity onPress={()=>this.handlerResult(nums[i][j])} style={css.btn} >
-                        <Text style={[css.btnText,css.operatorColor]}>{nums[i][j]}</Text>
+                if(this.nums[i][j]=='=' || this.nums[i][j]=='%' || this.nums[i][j]=='^' || this.nums[i][j]=='AC'){
+                    row.push(<TouchableOpacity onPress={()=>this.handlerResult(this.nums[i][j])} style={css.btn} >
+                        <Text style={[css.btnText,css.operatorColor]}>{this.nums[i][j]}</Text>
                     </TouchableOpacity>);
                 }
                 else{
-                    row.push(<TouchableOpacity onPress={()=>this.handlerResult(nums[i][j])} style={css.btn} >
-                        <Text style={css.btnText}>{nums[i][j]}</Text>
+                    row.push(<TouchableOpacity onPress={()=>this.handlerResult(this.nums[i][j])} style={css.btn} >
+                        <Text style={css.btnText}>{this.nums[i][j]}</Text>
                     </TouchableOpacity>);
                 }
             }
@@ -83,8 +117,8 @@ class Calcy extends Component {
 
                     <View style={css.operations}>
                         {
-                            operator.map(btn => {
-                                return <TouchableOpacity onPress={()=>this.handlerResult(btn)} style={css.btn} >
+                            this.operator.map(btn => {
+                                return <TouchableOpacity onPress={()=>this.operations(btn)} style={css.btn} >
                                     <Text style={[css.btnText,css.operatorColor]}>{btn}</Text>
                                 </TouchableOpacity>;
                             })
@@ -105,7 +139,10 @@ const css = StyleSheet.create({
 
    display : {
        flex : 2,
-       backgroundColor : 'white',
+       backgroundColor : 'black',
+       borderBottomColor : 'white',
+       borderBottomWidth : 0.2,
+
    },
 
     calculation : {
@@ -147,12 +184,14 @@ const css = StyleSheet.create({
     calculationString : {
        fontSize : 50,
        fontWeight : "600",
-        marginRight : 25
+        marginRight : 25,
+       color : 'white'
     },
 
     resultString : {
        fontSize: 40,
-        marginRight : 25
+        marginRight : 25,
+        color : 'white'
     },
 
     btn : {
